@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure File Sharing System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #11CC10, #52c234);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        /* Flash Messages */
+        .flash-messages {
+            margin-bottom: 20px;
+        }
+        
+        .alert {
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin: 10px 0;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: slideIn 0.3s ease-out;
+        }
+        
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            border-left: 4px solid #11CC10;
+        }
+        
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            border-left: 4px solid #dc3545;
+        }
+        
+        .alert-info {
+            background: #cce7ff;
+            color: #004085;
+            border: 1px solid #b3d7ff;
+            border-left: 4px solid #007bff;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .upload-section {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            border: 2px dashed #11CC10;
+        }
+        
+        .upload-form {
+            text-align: center;
+        }
+        
+        .file-input {
+            margin: 20px 0;
+        }
+        
+        .file-input input[type="file"] {
+            padding: 10px;
+            border: 2px solid #11CC10;
+            border-radius: 5px;
+            background: white;
+            width: 100%;
+            max-width: 400px;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #11CC10, #52c234);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(17, 204, 16, 0.3);
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, #6c757d, #5a6268);
+        }
+        
+        .files-section h2 {
+            color: #333;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #11CC10;
+            padding-bottom: 10px;
+        }
+        
+        .file-list {
+            list-style: none;
+        }
+        
+        .file-item {
+            background: #f8f9fa;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 4px solid #11CC10;
+            transition: all 0.3s ease;
+        }
+        
+        .file-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .file-name {
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .file-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .no-files {
+            text-align: center;
+            color: #666;
+            font-style: italic;
+            padding: 40px;
+        }
+        
+        .security-features {
+            background: #e8f5e8;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 30px;
+        }
+        
+        .security-features h3 {
+            color: #11CC10;
+            margin-bottom: 15px;
+        }
+        
+        .feature-list {
+            list-style: none;
+        }
+        
+        .feature-list li {
+            padding: 8px 0;
+            display: flex;
+            align-items: center;
+        }
+        
+        .feature-list li::before {
+            content: "✓";
+            color: #11CC10;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        
+        .download-notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #11CC10;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(17, 204, 16, 0.3);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: slideInRight 0.5s ease-out;
+        }
+        
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                margin: 10px;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+            
+            .file-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            
+            .file-actions {
+                width: 100%;
+                justify-content: flex-end;
+            }
+            
+            .download-notification {
+                top: 10px;
+                right: 10px;
+                left: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔐 Secure File Sharing</h1>
+            <p>Upload files securely with AES-256 encryption</p>
+        </div>
+        
+        <div class="content">
+            <!-- Flash Messages -->
+            <div class="flash-messages">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }}">
+                                {{ message | safe }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+            </div>
+            
+            <!-- Upload Section -->
+            <div class="upload-section">
+                <h2>📁 Upload & Encrypt File</h2>
+                <form class="upload-form" action="/upload" method="post" enctype="multipart/form-data">
+                    <div class="file-input">
+                        <input type="file" name="file" required>
+                    </div>
+                    <button type="submit" class="btn">
+                        🔒 Encrypt & Upload
+                    </button>
+                </form>
+            </div>
+            
+            <!-- Files List Section -->
+            <div class="files-section">
+                <h2>📂 Your Encrypted Files</h2>
+                
+                {% if files %}
+                <ul class="file-list">
+                    {% for file in files %}
+                    <li class="file-item">
+                        <span class="file-name">{{ file }}</span>
+                        <div class="file-actions">
+                            <a href="/download/{{ file }}" class="btn" onclick="showDownloadNotification('{{ file }}')">
+                                🔓 Download & Decrypt
+                            </a>
+                            <a href="/delete/{{ file }}" class="btn btn-danger" 
+                               onclick="return confirm('Are you sure you want to delete {{ file }}?')">
+                                🗑️ Delete
+                            </a>
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <div class="no-files">
+                    <p>No files uploaded yet. Upload a file to see it here!</p>
+                </div>
+                {% endif %}
+            </div>
+            
+            <!-- Security Features -->
+            <div class="security-features">
+                <h3>🛡️ Security Features</h3>
+                <ul class="feature-list">
+                    <li>AES-256 Encryption (Military Grade)</li>
+                    <li>Files encrypted before storage</li>
+                    <li>Secure key management</li>
+                    <li>Automatic decryption on download</li>
+                    <li>No files stored in plain text</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showDownloadNotification(filename) {
+            // Create download notification
+            const notification = document.createElement('div');
+            notification.className = 'download-notification';
+            notification.innerHTML = `
+                <span>📥</span>
+                <div>
+                    <strong>Downloading "${filename}"</strong><br>
+                    <small>File is being decrypted and downloaded securely...</small>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Remove notification after 5 seconds
+            setTimeout(() => {
+                notification.style.animation = 'slideInRight 0.5s ease-out reverse';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 500);
+            }, 5000);
+        }
+        
+        // Auto-hide flash messages after 5 seconds
+        document.addEventListener('DOMContentLoaded', function() {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                setTimeout(() => {
+                    alert.style.opacity = '0';
+                    alert.style.transform = 'translateY(-10px)';
+                    setTimeout(() => {
+                        if (alert.parentNode) {
+                            alert.parentNode.removeChild(alert);
+                        }
+                    }, 300);
+                }, 5000);
+            });
+        });
+        
+        // Show upload success animation
+        function showUploadSuccess(filename) {
+            const uploadBtn = document.querySelector('.upload-form .btn');
+            const originalText = uploadBtn.innerHTML;
+            
+            uploadBtn.innerHTML = '✅ Uploaded Successfully!';
+            uploadBtn.style.background = 'linear-gradient(135deg, #28a745, #20c997)';
+            
+            setTimeout(() => {
+                uploadBtn.innerHTML = originalText;
+                uploadBtn.style.background = 'linear-gradient(135deg, #11CC10, #52c234)';
+            }, 2000);
+        }
+    </script>
+</body>
+</html>
